@@ -1,4 +1,6 @@
-# Longchase Enterprise Limited — website
+# Longchase-Entreprise
+
+Longchase Enterprise Limited website for general supplies, procurement, and printing.
 
 A one-page site for Longchase Enterprise Limited (general supplies,
 procurement, and printing), built to match the roll-up banner: navy
