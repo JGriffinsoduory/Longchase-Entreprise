@@ -164,7 +164,10 @@ button{ font:inherit; }
 }
 .hero-actions{ display:flex; gap:16px; flex-wrap:wrap; margin-top:30px; animation:rise .6s .2s ease both; }
 .hero-art{ animation:rise .7s .15s ease both; }
-.device-illustration{ width:100%; max-width:380px; margin-inline:auto; }
+.company-banner{
+  width:100%; max-width:360px; max-height:620px; margin-inline:auto;
+  object-fit:contain; border:6px solid var(--white); box-shadow:0 18px 40px rgba(0,0,0,.28);
+}
 
 @keyframes rise{
   from{ opacity:0; transform:translateY(16px); }
@@ -318,7 +321,7 @@ button{ font:inherit; }
   .hero-inner{ grid-template-columns:1fr; padding-block:52px 90px; text-align:center; }
   .hero-lede{ margin-inline:auto; }
   .hero-actions{ justify-content:center; }
-  .hero-art{ max-width:260px; margin-inline:auto; }
+  .hero-art{ max-width:320px; margin-inline:auto; }
   .contact-inner{ grid-template-columns:1fr; }
   .section-title.left{ justify-content:center; text-align:center; }
 }
