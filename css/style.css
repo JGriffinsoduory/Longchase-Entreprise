@@ -218,7 +218,13 @@ button{ font:inherit; }
   width:24px; height:24px; border-radius:50%; background:var(--gold-500); color:var(--navy-950);
   display:flex; align-items:center; justify-content:center; font-size:.7rem; flex:none;
 }
-.printing-art svg{ max-width:280px; margin-inline:auto; }
+.printing-machine-crop{
+  position:relative; width:280px; height:360px; margin-inline:auto; overflow:hidden;
+  background:var(--white);
+}
+.printing-machine-crop img{
+  position:absolute; width:640px; max-width:none; left:-282px; top:-308px;
+}
 
 /* ---------- why choose us ---------- */
 .why-us{ background:var(--navy-950); padding-block:84px; }
