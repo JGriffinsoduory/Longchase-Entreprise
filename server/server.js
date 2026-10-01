@@ -23,7 +23,12 @@ const PORT = process.env.PORT || 3000;
 const DATA_FILE = path.join(__dirname, 'data', 'submissions.json');
 const SITE_ROOT = path.join(__dirname, '..');
 
-app.use(cors());
+const allowedOrigins = [
+  'https://longchase-entreprise.vercel.app',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000'
+];
+app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
 app.use(express.static(SITE_ROOT)); // serves index.html, css/, js/ as-is
 
