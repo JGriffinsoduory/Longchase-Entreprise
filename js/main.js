@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Preferred path: the Node/Express backend in /server, which
       // validates again server-side, stores the enquiry, and emails
       // it on if SMTP has been configured.
-      const response = await fetch('/api/contact', {
+      const response = await fetch('https://longchase-entreprise.onrender.com/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
