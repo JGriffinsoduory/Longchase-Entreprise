@@ -22,7 +22,10 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const DATA_FILE = path.join(__dirname, 'data', 'submissions.json');
 const REVIEWS_FILE = path.join(__dirname, 'data', 'reviews.json');
-const NOTIFICATION_EMAIL = process.env.CONTACT_TO_EMAIL || 'longchaseenterpriselimited@gmail.com';
+const configuredNotificationEmail = process.env.CONTACT_TO_EMAIL;
+const NOTIFICATION_EMAIL = configuredNotificationEmail && configuredNotificationEmail !== 'info@longchase.co.ke'
+  ? configuredNotificationEmail
+  : 'longchaseenterpriselimited@gmail.com';
 const SITE_ROOT = path.join(__dirname, '..');
 
 const allowedOrigins = [
