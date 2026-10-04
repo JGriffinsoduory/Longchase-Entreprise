@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /* ---------- active nav link on scroll ---------- */
-  const sections = ['services', 'printing', 'why-us', 'contact']
+  const sections = ['services', 'printing', 'why-us', 'reviews', 'contact']
     .map(id => document.getElementById(id))
     .filter(Boolean);
   const navLinks = Array.from(mainNav.querySelectorAll('a'));
@@ -220,6 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
   reviewForm.addEventListener('submit', async event => {
     event.preventDefault();
     const name = document.getElementById('review-name');
+    const email = document.getElementById('review-email');
     const company = document.getElementById('review-company');
     const experience = document.getElementById('review-experience');
     const submitButton = reviewForm.querySelector('.review-submit');
@@ -227,11 +228,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('#review-form .form-row').forEach(row => row.classList.remove('invalid'));
     document.getElementById('review-name-error').textContent = '';
+    document.getElementById('review-email-error').textContent = '';
     document.getElementById('review-experience-error').textContent = '';
-    if (name.value.trim().length < 2 || experience.value.trim().length < 10) {
+    const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim());
+    if (name.value.trim().length < 2 || !validEmail || experience.value.trim().length < 10) {
       if (name.value.trim().length < 2) {
         name.closest('.form-row').classList.add('invalid');
         document.getElementById('review-name-error').textContent = 'Please enter your name.';
+      }
+      if (!validEmail) {
+        email.closest('.form-row').classList.add('invalid');
+        document.getElementById('review-email-error').textContent = 'Please enter a valid email address.';
       }
       if (experience.value.trim().length < 10) {
         experience.closest('.form-row').classList.add('invalid');
@@ -247,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const response = await fetch(`${API_BASE}/api/reviews`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name.value.trim(), company: company.value.trim(), rating, experience: experience.value.trim() })
+        body: JSON.stringify({ name: name.value.trim(), email: email.value.trim(), company: company.value.trim(), rating, experience: experience.value.trim() })
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.message || 'Could not publish review');
