@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
       ].filter(Boolean);
       const body = encodeURIComponent(bodyLines.join('\n'));
 
-      window.location.href = `mailto:info@longchase.co.ke?subject=${subject}&body=${body}`;
+      window.location.href = `mailto:longchaseenterpriselimited@gmail.com?subject=${subject}&body=${body}`;
       status.textContent = 'Opening your email app to send this message…';
       form.reset();
     } finally {

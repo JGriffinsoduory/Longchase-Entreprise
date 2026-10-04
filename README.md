@@ -54,7 +54,7 @@ SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USER=you@gmail.com
 SMTP_PASS=your-app-password
-CONTACT_TO_EMAIL=info@longchase.co.ke
+CONTACT_TO_EMAIL=longchaseenterpriselimited@gmail.com
 ```
 
 ### Reading stored submissions

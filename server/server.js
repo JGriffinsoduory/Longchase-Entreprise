@@ -22,6 +22,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const DATA_FILE = path.join(__dirname, 'data', 'submissions.json');
 const REVIEWS_FILE = path.join(__dirname, 'data', 'reviews.json');
+const NOTIFICATION_EMAIL = process.env.CONTACT_TO_EMAIL || 'longchaseenterpriselimited@gmail.com';
 const SITE_ROOT = path.join(__dirname, '..');
 
 const allowedOrigins = [
@@ -113,7 +114,7 @@ app.post('/api/contact', async (req, res) => {
     try {
       await transporter.sendMail({
         from: process.env.CONTACT_FROM_EMAIL || process.env.SMTP_USER,
-        to: process.env.CONTACT_TO_EMAIL || 'info@longchase.co.ke',
+        to: NOTIFICATION_EMAIL,
         replyTo: submission.email,
         subject: `Website enquiry from ${submission.name}`,
         text: [
@@ -167,6 +168,28 @@ app.post('/api/reviews', async (req, res) => {
     const reviews = await readReviews();
     reviews.push(review);
     await fsPromises.writeFile(REVIEWS_FILE, JSON.stringify(reviews, null, 2), 'utf8');
+
+    if (transporter) {
+      try {
+        await transporter.sendMail({
+          from: process.env.CONTACT_FROM_EMAIL || process.env.SMTP_USER,
+          to: NOTIFICATION_EMAIL,
+          subject: `New customer review from ${review.name}`,
+          text: [
+            `Rating: ${review.rating}/5`,
+            `Name: ${review.name}`,
+            `Company: ${review.company || 'n/a'}`,
+            '',
+            review.experience,
+          ].join('\n'),
+        });
+      } catch (err) {
+        console.error('Review email notification failed (review was still saved):', err);
+      }
+    } else {
+      console.log('New customer review (SMTP not configured, stored locally only):', review);
+    }
+
     res.status(201).json({ success: true, review });
   } catch (err) {
     console.error('Could not save review:', err);
