@@ -87,6 +87,7 @@
     <nav class="main-nav" id="main-nav" aria-label="Primary">
       <a href="#services">Services</a>
       <a href="#printing">Printing</a>
+      <a href="#reviews">Reviews</a>
       <a href="#why-us">Why Us</a>
       <a href="#contact">Contact</a>
     </nav>
@@ -183,6 +184,71 @@
         <div class="printing-machine-crop">
           <img src="assets/company-banner.png.jpeg" alt="">
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CUSTOMER EXPERIENCES ============ -->
+  <section class="reviews-section" id="reviews">
+    <div class="container">
+      <div class="reviews-heading">
+        <div>
+          <p class="eyebrow">Customer experiences</p>
+          <h2>Trusted by teams that need things done well</h2>
+          <p>See what customers say about working with Longchase, then share your own experience.</p>
+        </div>
+        <div class="rating-summary" aria-live="polite">
+          <strong id="average-rating">--</strong>
+          <div class="stars" id="average-stars" aria-label="Average customer rating"></div>
+          <span><span id="review-count">0</span> customer reviews</span>
+        </div>
+      </div>
+
+      <div class="reviews-layout">
+        <div class="review-list" id="review-list" aria-live="polite">
+          <p class="reviews-loading">Loading customer experiences...</p>
+        </div>
+
+        <form class="review-form" id="review-form" novalidate>
+          <h3>Share your experience</h3>
+          <p class="review-form-intro">Your feedback helps other customers know what to expect.</p>
+
+          <div class="form-row">
+            <label for="review-name">Name</label>
+            <input type="text" id="review-name" name="name" autocomplete="name" required>
+            <span class="form-error" id="review-name-error"></span>
+          </div>
+
+          <div class="form-row">
+            <label for="review-company">Company <span class="optional">(optional)</span></label>
+            <input type="text" id="review-company" name="company" autocomplete="organization">
+          </div>
+
+          <fieldset class="rating-field">
+            <legend>Your rating</legend>
+            <div class="star-picker" role="radiogroup" aria-label="Choose a rating from one to five stars">
+              <input type="radio" id="rating-5" name="rating" value="5" checked>
+              <label for="rating-5" title="5 stars"><i class="fa-solid fa-star" aria-hidden="true"></i><span class="sr-only">5 stars</span></label>
+              <input type="radio" id="rating-4" name="rating" value="4">
+              <label for="rating-4" title="4 stars"><i class="fa-solid fa-star" aria-hidden="true"></i><span class="sr-only">4 stars</span></label>
+              <input type="radio" id="rating-3" name="rating" value="3">
+              <label for="rating-3" title="3 stars"><i class="fa-solid fa-star" aria-hidden="true"></i><span class="sr-only">3 stars</span></label>
+              <input type="radio" id="rating-2" name="rating" value="2">
+              <label for="rating-2" title="2 stars"><i class="fa-solid fa-star" aria-hidden="true"></i><span class="sr-only">2 stars</span></label>
+              <input type="radio" id="rating-1" name="rating" value="1">
+              <label for="rating-1" title="1 star"><i class="fa-solid fa-star" aria-hidden="true"></i><span class="sr-only">1 star</span></label>
+            </div>
+          </fieldset>
+
+          <div class="form-row">
+            <label for="review-experience">Your experience</label>
+            <textarea id="review-experience" name="experience" rows="4" maxlength="500" required></textarea>
+            <span class="form-error" id="review-experience-error"></span>
+          </div>
+
+          <button type="submit" class="btn btn-gold review-submit">Publish Review</button>
+          <p class="form-status" id="review-status" role="status" aria-live="polite"></p>
+        </form>
       </div>
     </div>
   </section>
@@ -292,6 +358,7 @@
     <nav class="footer-nav" aria-label="Footer">
       <a href="#services">Services</a>
       <a href="#printing">Printing</a>
+      <a href="#reviews">Reviews</a>
       <a href="#why-us">Why Us</a>
       <a href="#contact">Contact</a>
     </nav>

@@ -21,6 +21,7 @@ const fsPromises = fs.promises;
 const app = express();
 const PORT = process.env.PORT || 3000;
 const DATA_FILE = path.join(__dirname, 'data', 'submissions.json');
+const REVIEWS_FILE = path.join(__dirname, 'data', 'reviews.json');
 const SITE_ROOT = path.join(__dirname, '..');
 
 const allowedOrigins = [
@@ -40,6 +41,16 @@ async function ensureDataFile() {
     await fsPromises.access(DATA_FILE);
   } catch {
     await fsPromises.writeFile(DATA_FILE, '[]', 'utf8');
+  }
+}
+
+async function readReviews() {
+  await fsPromises.mkdir(path.dirname(REVIEWS_FILE), { recursive: true });
+  try {
+    return JSON.parse(await fsPromises.readFile(REVIEWS_FILE, 'utf8'));
+  } catch {
+    await fsPromises.writeFile(REVIEWS_FILE, '[]', 'utf8');
+    return [];
   }
 }
 
@@ -123,6 +134,42 @@ app.post('/api/contact', async (req, res) => {
   }
 
   res.json({ success: true, message: "Thanks, we've received your message and will be in touch." });
+});
+
+app.get('/api/reviews', async (req, res) => {
+  try {
+    const reviews = await readReviews();
+    res.json(reviews.sort((first, second) => new Date(second.submittedAt) - new Date(first.submittedAt)));
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Could not load reviews.' });
+  }
+});
+
+app.post('/api/reviews', async (req, res) => {
+  const { name, company, rating, experience } = req.body || {};
+  const numericRating = Number(rating);
+  if (!name || name.trim().length < 2 || !Number.isInteger(numericRating) || numericRating < 1 || numericRating > 5 || !experience || experience.trim().length < 10 || experience.trim().length > 500) {
+    return res.status(400).json({ success: false, message: 'Please provide a name, a rating from 1 to 5, and an experience of 10 to 500 characters.' });
+  }
+
+  const review = {
+    id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
+    name: name.trim().slice(0, 100),
+    company: (company || '').trim().slice(0, 100),
+    rating: numericRating,
+    experience: experience.trim(),
+    submittedAt: new Date().toISOString(),
+  };
+
+  try {
+    const reviews = await readReviews();
+    reviews.push(review);
+    await fsPromises.writeFile(REVIEWS_FILE, JSON.stringify(reviews, null, 2), 'utf8');
+    res.status(201).json({ success: true, review });
+  } catch (err) {
+    console.error('Could not save review:', err);
+    res.status(500).json({ success: false, message: 'Could not save your review.' });
+  }
 });
 
 // Protected admin route to read stored submissions during development.

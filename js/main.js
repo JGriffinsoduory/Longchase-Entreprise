@@ -5,6 +5,10 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
+  const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? ''
+    : 'https://longchase-entreprise.onrender.com';
+
   /* ---------- mobile nav toggle ---------- */
   const navToggle = document.getElementById('nav-toggle');
   const mainNav = document.getElementById('main-nav');
@@ -103,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Preferred path: the Node/Express backend in /server, which
       // validates again server-side, stores the enquiry, and emails
       // it on if SMTP has been configured.
-      const response = await fetch('https://longchase-entreprise.onrender.com/api/contact', {
+      const response = await fetch(`${API_BASE}/api/contact`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -163,4 +167,99 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   setActiveLink();
   window.addEventListener('scroll', setActiveLink, { passive: true });
+
+  /* ---------- customer reviews ---------- */
+  const reviewList = document.getElementById('review-list');
+  const reviewForm = document.getElementById('review-form');
+  const reviewStatus = document.getElementById('review-status');
+  const averageRating = document.getElementById('average-rating');
+  const averageStars = document.getElementById('average-stars');
+  const reviewCount = document.getElementById('review-count');
+
+  const renderStars = rating => Array.from({ length: 5 }, (_, index) =>
+    `<i class="fa-${index < rating ? 'solid' : 'regular'} fa-star" aria-hidden="true"></i>`
+  ).join('');
+
+  const initials = name => name.split(' ').map(part => part[0]).slice(0, 2).join('').toUpperCase();
+
+  const renderReviews = reviews => {
+    if (!reviews.length) {
+      reviewList.innerHTML = '<p class="reviews-loading">Be the first customer to share an experience.</p>';
+      averageRating.textContent = '--';
+      averageStars.innerHTML = renderStars(0);
+      reviewCount.textContent = '0';
+      return;
+    }
+
+    const average = reviews.reduce((total, review) => total + review.rating, 0) / reviews.length;
+    averageRating.textContent = average.toFixed(1);
+    averageStars.innerHTML = renderStars(Math.round(average));
+    reviewCount.textContent = reviews.length;
+    reviewList.innerHTML = reviews.map(review => `
+      <article class="review-card">
+        <div class="stars" aria-label="${review.rating} out of 5 stars">${renderStars(review.rating)}</div>
+        <blockquote>${review.experience}</blockquote>
+        <div class="review-author">
+          <div class="review-avatar" aria-hidden="true">${initials(review.name)}</div>
+          <div><strong>${review.name}</strong><span>${review.company || 'Customer'}</span></div>
+        </div>
+      </article>
+    `).join('');
+  };
+
+  const loadReviews = async () => {
+    try {
+      const response = await fetch(`${API_BASE}/api/reviews`);
+      if (!response.ok) throw new Error('Could not load reviews');
+      renderReviews(await response.json());
+    } catch (error) {
+      reviewList.innerHTML = '<p class="reviews-loading">Customer experiences are temporarily unavailable. Please check back soon.</p>';
+    }
+  };
+
+  reviewForm.addEventListener('submit', async event => {
+    event.preventDefault();
+    const name = document.getElementById('review-name');
+    const company = document.getElementById('review-company');
+    const experience = document.getElementById('review-experience');
+    const submitButton = reviewForm.querySelector('.review-submit');
+    const rating = Number(reviewForm.querySelector('input[name="rating"]:checked').value);
+
+    document.querySelectorAll('#review-form .form-row').forEach(row => row.classList.remove('invalid'));
+    document.getElementById('review-name-error').textContent = '';
+    document.getElementById('review-experience-error').textContent = '';
+    if (name.value.trim().length < 2 || experience.value.trim().length < 10) {
+      if (name.value.trim().length < 2) {
+        name.closest('.form-row').classList.add('invalid');
+        document.getElementById('review-name-error').textContent = 'Please enter your name.';
+      }
+      if (experience.value.trim().length < 10) {
+        experience.closest('.form-row').classList.add('invalid');
+        document.getElementById('review-experience-error').textContent = 'Please share at least 10 characters.';
+      }
+      reviewStatus.textContent = 'Please fix the highlighted fields.';
+      return;
+    }
+
+    submitButton.disabled = true;
+    reviewStatus.textContent = 'Publishing your review...';
+    try {
+      const response = await fetch(`${API_BASE}/api/reviews`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name.value.trim(), company: company.value.trim(), rating, experience: experience.value.trim() })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.message || 'Could not publish review');
+      reviewForm.reset();
+      reviewStatus.textContent = 'Thank you for sharing your experience.';
+      loadReviews();
+    } catch (error) {
+      reviewStatus.textContent = 'We could not publish your review right now. Please try again.';
+    } finally {
+      submitButton.disabled = false;
+    }
+  });
+
+  loadReviews();
 });

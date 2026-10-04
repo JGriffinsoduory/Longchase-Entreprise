@@ -1,0 +1,18 @@
+[
+  {
+    "id": "sample-1",
+    "name": "James O.",
+    "company": "Mombasa business owner",
+    "rating": 5,
+    "experience": "The team was responsive, organised and delivered our supplies when they promised.",
+    "submittedAt": "2026-09-28T10:00:00.000Z"
+  },
+  {
+    "id": "sample-2",
+    "name": "Amina K.",
+    "company": "School administrator",
+    "rating": 5,
+    "experience": "Our printing request was handled carefully and the final work came out exactly as expected.",
+    "submittedAt": "2026-09-29T14:30:00.000Z"
+  }
+]
