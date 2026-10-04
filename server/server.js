@@ -148,16 +148,15 @@ app.get('/api/reviews', async (req, res) => {
 });
 
 app.post('/api/reviews', async (req, res) => {
-  const { name, email, company, rating, experience } = req.body || {};
+  const { name, company, rating, experience } = req.body || {};
   const numericRating = Number(rating);
-  if (!name || name.trim().length < 2 || !email || !isValidEmail(email.trim()) || !Number.isInteger(numericRating) || numericRating < 1 || numericRating > 5 || !experience || experience.trim().length < 10 || experience.trim().length > 500) {
-    return res.status(400).json({ success: false, message: 'Please provide your name, a valid email, a rating from 1 to 5, and an experience of 10 to 500 characters.' });
+  if (!name || name.trim().length < 2 || !Number.isInteger(numericRating) || numericRating < 1 || numericRating > 5 || !experience || experience.trim().length < 10 || experience.trim().length > 500) {
+    return res.status(400).json({ success: false, message: 'Please provide your name, a rating from 1 to 5, and an experience of 10 to 500 characters.' });
   }
 
   const review = {
     id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
     name: name.trim().slice(0, 100),
-    email: email.trim().slice(0, 200),
     company: (company || '').trim().slice(0, 100),
     rating: numericRating,
     experience: experience.trim(),
