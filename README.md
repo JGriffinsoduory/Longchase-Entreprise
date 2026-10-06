@@ -44,9 +44,11 @@ website itself, so you only need to run one thing.
 3. Open **http://localhost:3000** — that's the full site, with the
    contact form now posting to the server.
 
-By default, submissions are just saved to `server/data/submissions.json`
-and printed to the terminal — nothing else to configure. To have them
-emailed to you as well, open `server/.env` and fill in your SMTP
+By default, submissions and customer reviews are saved to the JSON files
+under `server/data/` and printed to the terminal — nothing else to configure.
+Review writes are serialized and committed atomically, so simultaneous
+submissions are retained and survive server restarts. To have them emailed
+to you as well, open `server/.env` and fill in your SMTP
 details (for Gmail, use an "App Password", not your normal one):
 
 ```
@@ -70,9 +72,15 @@ Leave `ADMIN_TOKEN` blank to keep this disabled.
 ### Deploying the backend
 
 Any Node hosting works — Render, Railway, Fly.io, or a plain VPS with
-`pm2`. Set the same environment variables there as in `.env`, and
-point your domain at it. The frontend needs no changes: it always
-tries `/api/contact` on whatever host it's served from.
+`pm2`. Set the same environment variables there as in `.env`, and point
+your domain at it. The frontend needs no changes: it always tries
+`/api/contact` on whatever host it's served from.
+
+Reviews are permanent only when the host's filesystem is persistent. On
+Render, attach a persistent disk and set `DATA_DIR` to its mounted path
+(for example `/var/data`). On Railway, Fly.io, or a VPS, use their volume
+or disk storage. Without a persistent disk, a platform restart or redeploy
+can erase local JSON files even though the application writes them correctly.
 
 ## Editing the site
 

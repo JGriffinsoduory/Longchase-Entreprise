@@ -175,15 +175,49 @@ document.addEventListener('DOMContentLoaded', () => {
   const averageRating = document.getElementById('average-rating');
   const averageStars = document.getElementById('average-stars');
   const reviewCount = document.getElementById('review-count');
+  const reviewControls = document.getElementById('review-controls');
+  const reviewDots = document.getElementById('review-dots');
+  let loadedReviews = [];
+  let activeReview = 0;
+  let reviewTimer = null;
 
   const renderStars = rating => Array.from({ length: 5 }, (_, index) =>
     `<i class="fa-${index < rating ? 'solid' : 'regular'} fa-star" aria-hidden="true"></i>`
   ).join('');
 
   const initials = name => name.split(' ').map(part => part[0]).slice(0, 2).join('').toUpperCase();
+  const escapeHtml = value => String(value).replace(/[&<>'"]/g, character => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+  }[character]));
+
+  const showReview = (index, animate = true) => {
+    if (!loadedReviews.length) return;
+    activeReview = (index + loadedReviews.length) % loadedReviews.length;
+    reviewList.querySelectorAll('.review-card').forEach((card, cardIndex) => {
+      card.hidden = cardIndex !== activeReview;
+      card.classList.toggle('is-entering', animate && cardIndex === activeReview);
+    });
+    reviewDots.querySelectorAll('.review-dot').forEach((dot, dotIndex) => {
+      dot.classList.toggle('active', dotIndex === activeReview);
+      dot.setAttribute('aria-current', dotIndex === activeReview ? 'true' : 'false');
+    });
+  };
+
+  const stopReviewTimer = () => {
+    if (reviewTimer) window.clearInterval(reviewTimer);
+    reviewTimer = null;
+  };
+
+  const startReviewTimer = () => {
+    stopReviewTimer();
+    if (loadedReviews.length > 1) reviewTimer = window.setInterval(() => showReview(activeReview + 1), 6500);
+  };
 
   const renderReviews = reviews => {
     if (!reviews.length) {
+      loadedReviews = [];
+      stopReviewTimer();
+      reviewControls.hidden = true;
       reviewList.innerHTML = '<p class="reviews-loading">Be the first customer to share an experience.</p>';
       averageRating.textContent = '--';
       averageStars.innerHTML = renderStars(0);
@@ -195,16 +229,22 @@ document.addEventListener('DOMContentLoaded', () => {
     averageRating.textContent = average.toFixed(1);
     averageStars.innerHTML = renderStars(Math.round(average));
     reviewCount.textContent = reviews.length;
-    reviewList.innerHTML = reviews.map(review => `
-      <article class="review-card">
+    loadedReviews = reviews;
+    activeReview = Math.min(activeReview, reviews.length - 1);
+    reviewList.innerHTML = reviews.map((review, index) => `
+      <article class="review-card" ${index === activeReview ? '' : 'hidden'}>
         <div class="stars" aria-label="${review.rating} out of 5 stars">${renderStars(review.rating)}</div>
-        <blockquote>${review.experience}</blockquote>
+        <blockquote>${escapeHtml(review.experience)}</blockquote>
         <div class="review-author">
-          <div class="review-avatar" aria-hidden="true">${initials(review.name)}</div>
-          <div><strong>${review.name}</strong><span>${review.company || 'Customer'}</span></div>
+          <div class="review-avatar" aria-hidden="true">${escapeHtml(initials(review.name))}</div>
+          <div><strong>${escapeHtml(review.name)}</strong><span>${escapeHtml(review.company || 'Customer')}</span></div>
         </div>
       </article>
     `).join('');
+    reviewDots.innerHTML = reviews.map((review, index) => `<button type="button" class="review-dot${index === activeReview ? ' active' : ''}" aria-label="Show review ${index + 1}" aria-current="${index === activeReview ? 'true' : 'false'}"></button>`).join('');
+    reviewControls.hidden = reviews.length < 2;
+    showReview(activeReview, false);
+    startReviewTimer();
   };
 
   const loadReviews = async () => {
@@ -214,8 +254,21 @@ document.addEventListener('DOMContentLoaded', () => {
       renderReviews(await response.json());
     } catch (error) {
       reviewList.innerHTML = '<p class="reviews-loading">Customer experiences are temporarily unavailable. Please check back soon.</p>';
+      reviewControls.hidden = true;
     }
   };
+
+  reviewControls.addEventListener('click', event => {
+    const directionButton = event.target.closest('[data-review-direction]');
+    const dot = event.target.closest('.review-dot');
+    if (directionButton) showReview(activeReview + (directionButton.dataset.reviewDirection === 'next' ? 1 : -1));
+    if (dot) showReview(Number(dot.getAttribute('aria-label').replace(/\D/g, '')) - 1);
+    startReviewTimer();
+  });
+  reviewList.addEventListener('mouseenter', stopReviewTimer);
+  reviewList.addEventListener('mouseleave', startReviewTimer);
+  reviewList.addEventListener('focusin', stopReviewTimer);
+  reviewList.addEventListener('focusout', startReviewTimer);
 
   reviewForm.addEventListener('submit', async event => {
     event.preventDefault();

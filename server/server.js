@@ -20,8 +20,9 @@ const fsPromises = fs.promises;
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const DATA_FILE = path.join(__dirname, 'data', 'submissions.json');
-const REVIEWS_FILE = path.join(__dirname, 'data', 'reviews.json');
+const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
+const DATA_FILE = path.join(DATA_DIR, 'submissions.json');
+const REVIEWS_FILE = path.join(DATA_DIR, 'reviews.json');
 const configuredNotificationEmail = process.env.CONTACT_TO_EMAIL;
 const NOTIFICATION_EMAIL = configuredNotificationEmail && configuredNotificationEmail !== 'info@longchase.co.ke'
   ? configuredNotificationEmail
@@ -40,7 +41,7 @@ app.use(express.static(SITE_ROOT)); // serves index.html, css/, js/ as-is
 /* ---------- helpers ---------- */
 
 async function ensureDataFile() {
-  await fsPromises.mkdir(path.dirname(DATA_FILE), { recursive: true });
+  await fsPromises.mkdir(DATA_DIR, { recursive: true });
   try {
     await fsPromises.access(DATA_FILE);
   } catch {
@@ -49,13 +50,27 @@ async function ensureDataFile() {
 }
 
 async function readReviews() {
-  await fsPromises.mkdir(path.dirname(REVIEWS_FILE), { recursive: true });
+  await fsPromises.mkdir(DATA_DIR, { recursive: true });
   try {
     return JSON.parse(await fsPromises.readFile(REVIEWS_FILE, 'utf8'));
-  } catch {
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error;
     await fsPromises.writeFile(REVIEWS_FILE, '[]', 'utf8');
     return [];
   }
+}
+
+let reviewWriteQueue = Promise.resolve();
+
+function appendReview(review) {
+  reviewWriteQueue = reviewWriteQueue.then(async () => {
+    const reviews = await readReviews();
+    reviews.push(review);
+    const temporaryFile = `${REVIEWS_FILE}.${process.pid}.tmp`;
+    await fsPromises.writeFile(temporaryFile, JSON.stringify(reviews, null, 2), 'utf8');
+    await fsPromises.rename(temporaryFile, REVIEWS_FILE);
+  });
+  return reviewWriteQueue;
 }
 
 function isValidEmail(value) {
@@ -168,9 +183,7 @@ app.post('/api/reviews', async (req, res) => {
   };
 
   try {
-    const reviews = await readReviews();
-    reviews.push(review);
-    await fsPromises.writeFile(REVIEWS_FILE, JSON.stringify(reviews, null, 2), 'utf8');
+    await appendReview(review);
 
     if (transporter) {
       try {
