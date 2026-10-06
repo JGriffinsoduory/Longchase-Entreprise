@@ -130,9 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = await response.json().catch(() => ({}));
 
       if (response.ok && data.success) {
-        status.textContent = data.confirmationSent
-          ? 'Message sent successfully. A confirmation email has been sent to you.'
-          : (data.message || "Thanks, we've received your message.");
+        status.textContent = data.message || "Thanks, we've received your message.";
         form.reset();
       } else if (data.errors) {
         Object.entries(data.errors).forEach(([field, message]) => {

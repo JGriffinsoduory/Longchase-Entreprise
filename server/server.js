@@ -115,7 +115,6 @@ app.post('/api/contact', async (req, res) => {
     message: message.trim(),
     receivedAt: new Date().toISOString(),
   };
-  let confirmationSent = false;
 
   // 1. Always store the submission locally, so nothing is lost even
   //    if email sending isn't configured or temporarily fails.
@@ -144,40 +143,18 @@ app.post('/api/contact', async (req, res) => {
           `Phone: ${submission.phone || 'n/a'}`,
         ].join('\n'),
       });
-      confirmationSent = true;
     } catch (err) {
       // The submission is already saved above, so a failed email is
       // not fatal — just log it for the site owner to notice.
       console.error('Email send failed (submission was still saved):', err);
     }
 
-    try {
-      await transporter.sendMail({
-        from: process.env.CONTACT_FROM_EMAIL || process.env.SMTP_USER,
-        to: submission.email,
-        subject: 'ENQUIRY RECEIVED',
-        text: [
-          `Hello ${submission.name},`,
-          '',
-          'Your message has been received by Longchase Enterprise Limited.',
-          'Our team will review your enquiry and get back to you shortly.',
-          '',
-          'Your message:',
-          submission.message,
-          '',
-          'Longchase Enterprise Limited',
-        ].join('\n'),
-      });
-    } catch (err) {
-      console.error('Customer confirmation email failed (submission was still saved):', err);
-    }
   } else {
     console.log('New contact submission (SMTP not configured, stored locally only):', submission);
   }
 
   res.json({
     success: true,
-    confirmationSent,
     message: "Thanks, we've received your message and will be in touch.",
   });
 });
