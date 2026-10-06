@@ -17,12 +17,16 @@ document.addEventListener('DOMContentLoaded', () => {
     mainNav.classList.remove('open');
     navToggle.classList.remove('open');
     navToggle.setAttribute('aria-expanded', 'false');
+    header.classList.remove('menu-open');
   };
 
   navToggle.addEventListener('click', () => {
     const isOpen = mainNav.classList.toggle('open');
     navToggle.classList.toggle('open', isOpen);
     navToggle.setAttribute('aria-expanded', String(isOpen));
+    header.classList.toggle('menu-open', isOpen);
+    if (isOpen && headerHideTimer) window.clearTimeout(headerHideTimer);
+    if (!isOpen) revealHeaderBriefly();
   });
 
   // close the mobile menu after a link is chosen
@@ -30,11 +34,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ---------- sticky header shadow on scroll ---------- */
   const header = document.getElementById('header');
+  let headerHideTimer = null;
   const applyHeaderShadow = () => {
     header.style.boxShadow = window.scrollY > 8 ? '0 4px 14px rgba(11,26,51,.08)' : 'none';
   };
+  const revealHeaderBriefly = () => {
+    header.classList.remove('is-hidden');
+    if (headerHideTimer) window.clearTimeout(headerHideTimer);
+    if (window.scrollY > header.offsetHeight && !mainNav.classList.contains('open')) {
+      headerHideTimer = window.setTimeout(() => header.classList.add('is-hidden'), 1000);
+    }
+  };
   applyHeaderShadow();
-  window.addEventListener('scroll', applyHeaderShadow, { passive: true });
+  window.addEventListener('scroll', () => {
+    applyHeaderShadow();
+    revealHeaderBriefly();
+  }, { passive: true });
 
   /* ---------- footer year ---------- */
   const yearEl = document.getElementById('year');
@@ -210,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const startReviewTimer = () => {
     stopReviewTimer();
-    if (loadedReviews.length > 1) reviewTimer = window.setInterval(() => showReview(activeReview + 1), 60000);
+    if (loadedReviews.length > 1) reviewTimer = window.setInterval(() => showReview(activeReview + 1), 30000);
   };
 
   const renderReviews = reviews => {

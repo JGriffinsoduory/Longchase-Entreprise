@@ -99,7 +99,11 @@ button{ font:inherit; }
   position:sticky; top:0; z-index:100;
   background:var(--white);
   border-bottom:1px solid var(--border);
+  transition:transform .25s ease, box-shadow .25s ease;
 }
+.site-header.is-hidden{ transform:translateY(-100%); }
+.site-header:focus-within, .site-header.menu-open,
+.site-header.is-hidden:focus-within, .site-header.is-hidden.menu-open{ transform:translateY(0); }
 .header-inner{
   display:flex; align-items:center; gap:24px;
   height:var(--header-h);
