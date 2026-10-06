@@ -134,7 +134,7 @@ app.post('/api/contact', async (req, res) => {
         from: process.env.CONTACT_FROM_EMAIL || process.env.SMTP_USER,
         to: NOTIFICATION_EMAIL,
         replyTo: submission.email,
-        subject: `Website enquiry from ${submission.name}`,
+        subject: 'ENQUIRY',
         text: [
           submission.message,
           '',

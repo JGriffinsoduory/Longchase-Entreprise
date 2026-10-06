@@ -146,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // opened as static files, or hosted somewhere without the
       // /server app running. Hand the message to the visitor's email
       // client instead, addressed and pre-filled.
-      const subject = encodeURIComponent(`Website enquiry from ${payload.name}`);
+      const subject = encodeURIComponent('ENQUIRY');
       const bodyLines = [
         payload.message,
         '',
