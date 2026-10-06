@@ -210,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const startReviewTimer = () => {
     stopReviewTimer();
-    if (loadedReviews.length > 1) reviewTimer = window.setInterval(() => showReview(activeReview + 1), 6500);
+    if (loadedReviews.length > 1) reviewTimer = window.setInterval(() => showReview(activeReview + 1), 60000);
   };
 
   const renderReviews = reviews => {
@@ -259,9 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   reviewControls.addEventListener('click', event => {
-    const directionButton = event.target.closest('[data-review-direction]');
     const dot = event.target.closest('.review-dot');
-    if (directionButton) showReview(activeReview + (directionButton.dataset.reviewDirection === 'next' ? 1 : -1));
     if (dot) showReview(Number(dot.getAttribute('aria-label').replace(/\D/g, '')) - 1);
     startReviewTimer();
   });

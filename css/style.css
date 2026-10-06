@@ -263,8 +263,6 @@ button{ font:inherit; }
 .review-author span{ display:block; color:var(--ink-500); font-size:.75rem; }
 .reviews-loading{ grid-column:1/-1; color:var(--ink-500); }
 .review-controls{ grid-column:1; display:flex; align-items:center; justify-content:center; gap:18px; margin-top:18px; }
-.review-arrow{ width:38px; height:38px; border:1px solid var(--border); border-radius:50%; background:var(--white); color:var(--navy-950); cursor:pointer; }
-.review-arrow:hover, .review-arrow:focus-visible{ border-color:var(--gold-500); color:var(--gold-600); }
 .review-dots{ display:flex; gap:8px; }
 .review-dot{ width:9px; height:9px; padding:0; border:0; border-radius:50%; background:var(--border); cursor:pointer; }
 .review-dot.active{ background:var(--gold-500); transform:scale(1.25); }
