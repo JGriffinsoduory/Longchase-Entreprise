@@ -196,11 +196,23 @@ button{ font:inherit; }
 .card{
   background:var(--white); border:1px solid var(--border); border-radius:var(--radius);
   padding:32px 24px; text-align:center;
+  transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.card:hover, .card:focus-within{
+  transform:translateY(-6px);
+  border-color:rgba(224,168,46,.55);
+  box-shadow:0 14px 28px rgba(11,26,51,.12);
 }
 .card-icon{
   width:60px; height:60px; margin:0 auto 18px; border-radius:50%;
   background:var(--navy-950); color:var(--gold-500);
   display:flex; align-items:center; justify-content:center; font-size:1.4rem;
+  transition:transform .2s ease, background-color .2s ease;
+}
+.card:hover .card-icon, .card:focus-within .card-icon{
+  transform:scale(1.08) rotate(-3deg);
+  background:var(--gold-500);
+  color:var(--navy-950);
 }
 .card h3{ font-size:1.05rem; margin-bottom:.4em; }
 .card p{ font-size:.92rem; margin:0; }
@@ -386,4 +398,9 @@ button{ font:inherit; }
   .why-item{ border-left:none !important; border-top:1px solid rgba(255,255,255,.15); padding-top:26px; }
   .why-item:first-child{ border-top:none; padding-top:0; }
   .ribbon p{ font-size:.7rem; }
+}
+
+@media (prefers-reduced-motion:reduce){
+  .card, .card-icon{ transition:none; }
+  .card:hover, .card:focus-within, .card:hover .card-icon, .card:focus-within .card-icon{ transform:none; }
 }
